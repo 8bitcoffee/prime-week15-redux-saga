@@ -4,36 +4,32 @@ import axios from 'axios';
 
 function App() {
   const dispatch = useDispatch();
-  const elements = useSelector(store => store.elementList)
+  const elements = useSelector(store => store.elementList);
   const [newElement, setNewElement] = useState('');
+  const planets = useSelector(store => store.planets);
 
   const getElements = () => {
-    axios.get('/api/element').then(response => {
-      dispatch({ type: 'SET_ELEMENTS', payload: response.data });
+    dispatch({type:"FETCH_ELEMENTS"});
+  }
+
+  const getPlanets = () => {
+    dispatch({
+      type: "FETCH_PLANETS"
     })
-      .catch(error => {
-        console.log('error with element get request', error);
-      });
   }
 
   useEffect(() => {
     getElements();
+    getPlanets();
   }, []);
 
   const addElement = () => {
-    axios.post('/api/element', { 
-      name: newElement
-    })
-      .then(() => {
-        getElements();
-        setNewElement('');
-      })
-      .catch(error => {
-        console.log('error with element get request', error);
-      });
-
+    dispatch({
+      type: "ADD_ELEMENT",
+      payload: {name: newElement}
+    });
+    setNewElement("");
   }
-
 
   return (
     <div>
@@ -52,9 +48,12 @@ function App() {
         onChange={evt => setNewElement(evt.target.value)} 
       />
       <button onClick={addElement}>Add Element</button>
+      <h2>Planets</h2>
+      <ul>
+        {planets.map(planet => <li key={planet.name}>{planet.name}</li>)}
+      </ul>
     </div>
   );
 }
-
 
 export default App;
